@@ -1,0 +1,121 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for Multi-Admin ACL
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserEmail() {
+      return isSignedIn() && request.auth.token.email != null ? request.auth.token.email.lower() : '';
+    }
+
+    function getAdminDoc() {
+      return get(/databases/$(database)/documents/settings/admins);
+    }
+
+    function adminDocExists() {
+      return exists(/databases/$(database)/documents/settings/admins);
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        adminDocExists() && (
+          request.auth.uid in getAdminDoc().data.get('uids', []) ||
+          getUserEmail() in getAdminDoc().data.get('emails', [])
+        );
+    }
+
+    function isOwnerOrSuperAdmin() {
+      return isSignedIn() &&
+        adminDocExists() && (
+          request.auth.uid == getAdminDoc().data.get('primaryUid', '') ||
+          getUserEmail() == getAdminDoc().data.get('primaryEmail', '').lower() ||
+          getUserEmail() in getAdminDoc().data.get('superEmails', [])
+        );
+    }
+
+    // 1. Settings & Admin ACL
+    match /settings/admins {
+      // Any authenticated user can read settings/admins to check their admin status
+      // or to detect if initial bootstrap is needed.
+      allow read: if isSignedIn();
+      // Allow bootstrap ONLY when document does not exist yet
+      // The primaryEmail in the new doc must match the authenticated user's email
+      // This prevents any user from claiming someone else as primary owner
+      allow create: if isSignedIn() &&
+        !adminDocExists() &&
+        request.resource.data.get('primaryEmail', '').lower() == getUserEmail() &&
+        request.resource.data.get('primaryUid', '') == request.auth.uid;
+      // Allow update ONLY for Super Admin / Owner, permanently locking primaryEmail
+      allow update: if isOwnerOrSuperAdmin() &&
+        request.resource.data.get('primaryEmail', '') == resource.data.get('primaryEmail', '');
+      // Never allow deletion of the admin registry
+      allow delete: if false;
+    }
+
+    // 2. Public CMS Content: Global 24/7 public read, admin-only write
+    match /cms/public {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /cms/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 3. Meeting Booked Slots: Public read to show availability without leaking personal details
+    match /booked_slots/{slotId} {
+      allow read: if true;
+      // Allow public booking creation/deletion or admin management
+      allow create: if true;
+      allow update: if isAdmin();
+      allow delete: if true;
+    }
+
+    // 4. Referral Codes: Public read for code validation
+    match /referral_codes/{code} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // 5. Leads & Enquiries: Public create 24/7, admin manage
+    match /leads/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 6. Referral Leads: Public create 24/7, admin manage
+    match /referral_leads/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 7. Appointments: Public create 24/7, admin manage
+    match /appointments/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 8. Meetings: Public create, clients manage their own, admin manages all
+    match /meetings/{id} {
+      allow create: if true;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.get('uid', '') == request.auth.uid);
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.get('uid', '') == request.auth.uid);
+    }
+
+    // 9. Users: Signed in user manages own profile, admin reads all
+    match /users/{userId} {
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow write: if isAdmin() || (isSignedIn() && request.auth.uid == userId);
+    }
+
+    // 10. Audit Logs: Admin create & read, immutable (never update or delete)
+    match /audit_logs/{id} {
+      allow read, create: if isAdmin();
+      allow update, delete: if false;
+    }
+  }
+}

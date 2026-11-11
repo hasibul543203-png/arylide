@@ -1,4 +1,7 @@
 {
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
     "public": "frontend",
     "ignore": [
@@ -9,7 +12,7 @@
     ],
     "headers": [
       {
-        "source": "service-worker.js",
+        "source": "@(service-worker.js|config.js|cms-seed.js|admin.html|admin-cloud.js)",
         "headers": [
           {
             "key": "Cache-Control",
@@ -18,7 +21,7 @@
         ]
       },
       {
-        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|js|css)",
+        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp)",
         "headers": [
           {
             "key": "Cache-Control",
@@ -28,6 +31,14 @@
       }
     ],
     "rewrites": [
+      {
+        "source": "/admin",
+        "destination": "/admin.html"
+      },
+      {
+        "source": "/admin/",
+        "destination": "/admin.html"
+      },
       {
         "source": "**",
         "destination": "/index.html"

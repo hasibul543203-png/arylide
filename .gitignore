@@ -1,16 +1,26 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
+
+# Databases & local state (Preserve zero data loss)
 data/
 *.sqlite3
 *.sqlite3-shm
 *.sqlite3-wal
+
+# Build artifacts & packages
+*.zip
 *.apk
 *.exe
 *.blockmap
-android-app/.gradle/
-android-app/local.properties
-android-app/**/build/
-desktop-app/node_modules/
-desktop-app/dist/
+netlify-build/
+.firebase/
+.vercel/
+
+# Dependencies & IDE
+node_modules/
+.vscode/
+.idea/
 backups/
 .tools/

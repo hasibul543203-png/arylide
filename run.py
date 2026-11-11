@@ -1051,7 +1051,7 @@ class AppHandler(BaseHTTPRequestHandler):
                 "Cache-Control": "no-store",
             })
             return
-        if path in {"/manifest.webmanifest", "/service-worker.js", "/config.js", "/i18n.js", "/firebase.js", "/app.js", "/app.css", "/SOURCES.md", "/ANDROID-APK-INSTALL.md"}:
+        if path in {"/manifest.webmanifest", "/service-worker.js", "/config.js", "/i18n.js", "/firebase.js", "/app.js", "/app.css", "/SOURCES.md", "/ANDROID-APK-INSTALL.md", "/arylide-holdings-ready-to-deploy.zip"}:
             self.serve_asset(path.lstrip("/"))
             return
         if path.startswith("/assets/"):
