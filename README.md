@@ -56,3 +56,43 @@ The app shell can be cached for offline viewing. Form submissions, meetings, Aut
 - `NOTIFICATIONS-SETUP.md` — secure optional relay configuration.
 - `PHONE-SETUP.md` — Termux/PWA and iOS notes.
 - `ODOO-UPDATE-PACK.md` — separate, paste-ready Odoo website update material; no live Odoo edits were made.
+
+- # 🏠 Arylide Ashiyana
+
+> **আশিয়ানা মানে শুধু একটা বিল্ডিং না।**
+> আশিয়ানা মানে একটা ঠিকানা, একটা আশ্রয়, একটা শান্তি।
+>
+> যেখানে দিন শেষে ফিরে এসে মনে হবে - আমি বাড়ি ফিরছি।
+
+**Arylide Ashiyana** - by **Arylide Holdings Limited**
+
+---
+
+## ✨ Features
+
+- 🏢 G + 9 Residential Building (G to 10 Roof)
+- 🌿 Roof Garden
+- 🌞 Modern 3D Design / Architectural View
+- 🛗 Lift, Parking & Security
+- 📱 Fully Responsive Web App
+- 🚀 Deployed on Netlify
+
+## 🛠️ Tech Stack
+
+- Next.js / React
+- Tailwind CSS
+- TypeScript
+- Netlify
+
+## 🚀 How to Run Locally
+
+```bash
+git clone https://github.com/YOUR-USERNAME/arylide-full-app.git
+cd arylide-full-app
+npm install
+npm run dev
+
+🌐 Live Demo🔗 Live Link: https://arylideholdinglimited.netlify.app🤝 AboutArylide Holdings Limited
+আমরা বানাই না শুধু বিল্ডিং, আমরা বানাই আশিয়ান
+
+।Made with ❤️ by AQD TEAM
